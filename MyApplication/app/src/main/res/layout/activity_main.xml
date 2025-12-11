@@ -78,6 +78,14 @@
             android:layout_height="wrap_content"
             android:text="שמור אנשי קשר"
             android:textAppearance="@style/TextAppearance.AppCompat.Display1" />
+
+        <Button
+            android:id="@+id/triggerFall"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_margin="10dp"
+            android:text="דמה נפילה מהצמיד"
+            android:textAppearance="@style/TextAppearance.AppCompat.Display1" />
     </LinearLayout>
 
 

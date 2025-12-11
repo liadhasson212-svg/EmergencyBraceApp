@@ -1,11 +1,12 @@
 package com.example.myapplication;
 
-import android.content.Intent;
-import android.net.Uri;
+import android.content.Context;
 import android.os.Bundle;
+import android.telephony.PhoneNumberUtils;
 import android.telephony.SmsManager;
 import android.view.View;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.Toast;
 
 import androidx.activity.EdgeToEdge;
@@ -14,12 +15,20 @@ import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 
+import java.io.BufferedReader;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStreamReader;
+
 public class MainActivity extends AppCompatActivity {
+
+    public static final String EMERGENCY_BRACE_DB_NAME = "db.txt";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         Button btnSaveContacts = null;
-        Button btnMada = null;
+        Button triggerFall = null;
 
         super.onCreate(savedInstanceState);
         EdgeToEdge.enable(this);
@@ -29,19 +38,56 @@ public class MainActivity extends AppCompatActivity {
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
             return insets;
         });
+
         btnSaveContacts = this.findViewById(R.id.saveContacts);
+        triggerFall = this.findViewById(R.id.triggerFall);
+
+        final EditText emegencyContactNum1 = this.findViewById(R.id.emergencyNum1);
+        final EditText emegencyContactNum2 = this.findViewById(R.id.emergencyNum2);
+        final EditText emergencyMsg = this.findViewById(R.id.large_edit_text);
+
+        EditText finalEmegencyContactNum = emegencyContactNum1;
+        EditText finalEmergencyMsg = emergencyMsg;
+
         btnSaveContacts.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v)
             {
-                Toast.makeText(getApplicationContext(), "Saving contacs for emergency ", Toast.LENGTH_SHORT).show();
+                //Toast.makeText(getApplicationContext(), "Saving contacs for emergency ", Toast.LENGTH_SHORT).show();
+                saveContactInDB(finalEmegencyContactNum.getText().toString(),emegencyContactNum2.getText().toString(), finalEmergencyMsg.getText().toString());
+
                 /*String phoneNumber = "1221"; // Replace with your desired phone number
                 Intent dialIntent = new Intent(Intent.ACTION_DIAL);
                 dialIntent.setData(Uri.parse("tel:" + phoneNumber));
                 startActivity(dialIntent);
                 */
-
             }
         });
+
+        triggerFall.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                manFellDown();
+            }
+        });
+    }
+
+    private void saveContactInDB(String emergencyNum1, String emergencyNum2, String emergencyMsg) {
+        try {
+           PhoneNumberUtils.formatNumber(emergencyNum1);
+           PhoneNumberUtils.formatNumber(emergencyNum2);
+
+            //For example : 0543540000#0552282628#Help its saba Yaaakov I fell down
+            String saveText = new StringBuffer()
+                    .append(emergencyNum1).append("#")
+                    .append(emergencyNum2).append("#")
+                    .append(emergencyMsg).toString();
+
+            FileOutputStream fos = this.openFileOutput(EMERGENCY_BRACE_DB_NAME, Context.MODE_APPEND);
+            fos.write((saveText + "\n").getBytes());
+            fos.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
     /**
@@ -49,18 +95,42 @@ public class MainActivity extends AppCompatActivity {
      */
     public void manFellDown(){
         //Fetch from DB the contacts and the messgae which the user defined and send SMS
-        readFromDB()
-        String phoneNumber1 = "0543540000";
-        String phoneNumber2 = "0552282628";
-        String msg = "Help !!!\n" +
-                "            , I fell down please call Mada now and come to my house\" ";
-        String dbWrite = phoneNumber1+","+phoneNumber2+","+msg;
-
-        sendSMS(phoneNumber1,msg);
-        sendSMS(phoneNumber2,msg);
+        DbEmergencyData dbEmergencyData = readFromDB();
+        sendSMS(dbEmergencyData.emergencyContacNum1,dbEmergencyData.emergencyMsg);
+        sendSMS(dbEmergencyData.emergencyContacNum2,dbEmergencyData.emergencyMsg);
     }
-    private void sendSMS(String phoneNumber, String msg){
 
+
+    private DbEmergencyData readFromDB() {
+        StringBuilder builder = new StringBuilder();
+
+        try {
+            //open and read from DB file the line of emergency contcact and msg
+            FileInputStream fis = this.openFileInput(EMERGENCY_BRACE_DB_NAME);
+            BufferedReader reader = new BufferedReader(new InputStreamReader(fis));
+
+            String line;
+            while ((line = reader.readLine()) != null) {
+                builder.append(line).append("\n");
+            }
+
+            reader.close();
+            fis.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        //For example : 0543540000#0552282628#Help its saba Yaaakov I fell down
+        String[] parts = builder.toString().split("#");
+        if(parts != null && parts.length >=3) {
+            DbEmergencyData dbEmergencyData = new DbEmergencyData(parts[0], parts[1], parts[2]);
+            return dbEmergencyData;
+        }
+
+        return null;
+    }
+
+    private void sendSMS(String phoneNumber, String msg){
         try {
             SmsManager smsManager = SmsManager.getDefault();
             smsManager.sendTextMessage(phoneNumber, null, msg, null, null);
