@@ -1,9 +1,10 @@
-package com.example.myapplication;
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                          package com.example.myapplication;
 
 import android.content.Context;
 import android.os.Bundle;
 import android.telephony.PhoneNumberUtils;
 import android.telephony.SmsManager;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -21,9 +22,17 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
 
-public class MainActivity extends AppCompatActivity {
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
+
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                          public class MainActivity extends AppCompatActivity {
 
     public static final String EMERGENCY_BRACE_DB_NAME = "db.txt";
+    private DatabaseReference databaseReference;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -69,8 +78,36 @@ public class MainActivity extends AppCompatActivity {
                 manFellDown();
             }
         });
+
+        databaseReference = FirebaseDatabase.getInstance().getReference();
+        databaseReference.child("message").setValue("Hello, World!");
+
+        // Read from the database
+        databaseReference.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                // This method is called once with the initial value and again
+                // whenever data at this location is updated.
+                String value = dataSnapshot.getValue(String.class);
+
+                //Log.d("Emeregency brace", "got message from server Value is: " + value);
+            }
+
+            @Override
+            public void onCancelled(DatabaseError error) {
+                // Failed to read value
+                //Log.w(TAG, "Failed to read value.", error.toException());
+            }
+        });
     }
 
+
+    /**
+     * This function will save in a text file the emergency numbers which the user choose in the main screen
+     * @param emergencyNum1
+     * @param emergencyNum2
+     * @param emergencyMsg
+     */
     private void saveContactInDB(String emergencyNum1, String emergencyNum2, String emergencyMsg) {
         try {
            PhoneNumberUtils.formatNumber(emergencyNum1);
@@ -91,7 +128,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     /**
-     * This is the function which the esp32 will call via BT/Wifi to send SMS to emergency contacts
+     * This is the function which the Firebase server will call via Server -Client to send SMS to emergency contacts
      */
     public void manFellDown(){
         //Fetch from DB the contacts and the messgae which the user defined and send SMS
@@ -100,7 +137,10 @@ public class MainActivity extends AppCompatActivity {
         sendSMS(dbEmergencyData.emergencyContacNum2,dbEmergencyData.emergencyMsg);
     }
 
-
+    /**
+     * This Fucntion read the emergency contacts numbers when the app needs to send emergency SMS
+     * @return
+     */
     private DbEmergencyData readFromDB() {
         StringBuilder builder = new StringBuilder();
 
