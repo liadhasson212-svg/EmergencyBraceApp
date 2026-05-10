@@ -81,16 +81,11 @@ public class MainActivity extends AppCompatActivity {
                 manFellDown();//קורא לפונקציה שמדמה מצב חירום
             }//סגירת פונקציית onClick
         });//סגירת מאזין הלחיצה
-
-
     }
 
     protected void onPostCreate(@Nullable Bundle savedInstanceState){
         super.onPostCreate(savedInstanceState);
-        if(!appInitiated){
-//            Log.i("App was not initiated yet !!")
-            return;
-        }
+        Log.i("Emeregency brace","App initiated. register to Firebase !!");
         databaseReference = FirebaseDatabase.getInstance().getReference();//מקבל הפניה למסד הנתונים של Firebase
         //databaseReference.child("message").setValue("Hello, World!");//יוצר או מעדכן את השדה "message" בערך "Hello, World!"
 
@@ -101,10 +96,13 @@ public class MainActivity extends AppCompatActivity {
                 // This method is called once with the initial value and again
                 // whenever data at this location is updated.
                 //Map value = dataSnapshot.getValue(HashMap.class);//מקבל את הערך החדש כטקסט
-                manFellDown();//קורא שוב לפונקציית החירום כדי לשלוח SMS
-
-                Log.d("Emeregency brace", "got message from server Value is: ");
-            }//סגירת onDataChange
+                if(appInitiated) {
+                    Log.d("Emeregency brace", "got message from server Value is:" + dataSnapshot.toString());
+                    manFellDown();//קורא שוב לפונקציית החירום כדי לשלוח SMS
+                }else{
+                    Log.d("Emeregency brace", "emergency contacts were not saved yet");
+                }
+            }
 
             @Override
             public void onCancelled(DatabaseError error) {//קרא במקרה של כשל בקריאה מהמסד
@@ -134,6 +132,7 @@ public class MainActivity extends AppCompatActivity {
             FileOutputStream fos = this.openFileOutput(EMERGENCY_BRACE_DB_NAME, Context.MODE_APPEND);//פותח קובץ פנימי של האפליקציה לכתיבה
             fos.write((saveText + "\n").getBytes());//שומר את המחרוזת בקובץ ומוסיף שורה חדשה
             fos.close();//סוגר את הקובץ לאחר כתיבה
+            Log.d("EmergencyBrace", "Emergency contact were saved in DB ");
         } catch (IOException e) {//תופס שגיאה אפשרית בזמן כתיבה
             e.printStackTrace();//מדפיס את השגיאה ללוג
         }//סיום ה-try-catch
@@ -183,6 +182,7 @@ public class MainActivity extends AppCompatActivity {
     }//סיום הפונקציה
 
     private void sendSMS(String phoneNumber, String msg){//פונקציה לשליחת SMS למספר מסוים
+        Log.d("Emeregency brace", "Sending SMS to"+ phoneNumber);
         try {//התחלת בלוק לטיפול בשגיאות
             if (ContextCompat.checkSelfPermission(this, Manifest.permission.SEND_SMS)
                     == PackageManager.PERMISSION_GRANTED) {
