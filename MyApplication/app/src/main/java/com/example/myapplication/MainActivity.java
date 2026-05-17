@@ -182,12 +182,13 @@ public class MainActivity extends AppCompatActivity {
     }//סיום הפונקציה
 
     private void sendSMS(String phoneNumber, String msg){//פונקציה לשליחת SMS למספר מסוים
-        Log.d("Emeregency brace", "Sending SMS to"+ phoneNumber);
+        Log.d("Emeregency brace", "About to send SMS to "+ phoneNumber);
         try {//התחלת בלוק לטיפול בשגיאות
             if (ContextCompat.checkSelfPermission(this, Manifest.permission.SEND_SMS)
                     == PackageManager.PERMISSION_GRANTED) {
                 SmsManager smsManager = SmsManager.getDefault();//מקבל את מנהל ה-SMS של המכשיר
                 smsManager.sendTextMessage(phoneNumber, null, msg, null, null);//שולח הודעת SMS למספר עם הטקסט
+                Log.d("Emeregency brace", "SMS sent to "+ phoneNumber);
             }
         } catch (Exception e) {//תופס שגיאות למשל אין הרשאה או אין אפשרות לשלוח SMS
             // Handle potential exceptions (e.g., no SMS capabilities, permission denied)
