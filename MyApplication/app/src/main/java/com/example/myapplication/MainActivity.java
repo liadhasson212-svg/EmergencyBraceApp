@@ -40,7 +40,6 @@ public class MainActivity extends AppCompatActivity {
     @Override//מציין שאנחנו משתמשים בגרסה משלנו לפונקציה שקיימת במחלקה אחרת
     protected void onCreate(Bundle savedInstanceState) {//הפונקציה שנקראת כשהמסך נוצר. כאן בונים את ה־UI ומחברים את הכפתורים
         Button btnSaveContacts = null;//הכרזה על משתנה לכפתור שמאוחר יותר נגדיר מה הוא
-        Button triggerFall = null;//עוד כפתור שנשתמש בו בהמשך
 
         super.onCreate(savedInstanceState);//קורא לגרסה המקורית של onCreate מהמחלקה שממנה ירשנו
         EdgeToEdge.enable(this);//מפעיל מצב מסך־מלא יפה וחדש
@@ -52,8 +51,6 @@ public class MainActivity extends AppCompatActivity {
         });
 
         btnSaveContacts = this.findViewById(R.id.saveContacts);//מחבר את הכפתור שמירת אנשי קשר מהעיצוב לקוד.
-        triggerFall = this.findViewById(R.id.triggerFall);//מחבר כפתור נוסף למסך (כנראה הדמיית נפילה)
-
         final EditText emegencyContactNum1 = this.findViewById(R.id.emergencyNum1);//מחבר את שדה מספר חירום 1
         final EditText emegencyContactNum2 = this.findViewById(R.id.emergencyNum2);//מחבר את שדה מספר חירום 2
         final EditText emergencyMsg = this.findViewById(R.id.large_edit_text);//מחבר את שדה הודעת החירום שהמשתמש כותב
@@ -74,13 +71,6 @@ public class MainActivity extends AppCompatActivity {
                 *///
             }//
         });//
-
-        triggerFall.setOnClickListener(new View.OnClickListener() {//מאזין לאירוע לחיצה על כפתור triggerFall
-            @Override//מציין שהפונקציה הזו מחליפה פונקציה קיימת (onClick)
-            public void onClick(View view) {//כאשר נלחץ הכפתור
-                manFellDown();//קורא לפונקציה שמדמה מצב חירום
-            }//סגירת פונקציית onClick
-        });//סגירת מאזין הלחיצה
     }
 
     protected void onPostCreate(@Nullable Bundle savedInstanceState){

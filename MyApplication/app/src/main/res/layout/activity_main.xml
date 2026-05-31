@@ -79,36 +79,5 @@
             android:text="שמור אנשי קשר"
             android:textAppearance="@style/TextAppearance.AppCompat.Display1" />
 
-        <Button
-            android:id="@+id/triggerFall"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_margin="10dp"
-            android:text="דמה נפילה מהצמיד"
-            android:textAppearance="@style/TextAppearance.AppCompat.Display1" />
     </LinearLayout>
-
-
-    <!--
-
-    <Button
-        android:id="@+id/btnIhudHazala"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="איחוד הצלה"
-        android:layout_margin="50dp"
-        android:textAppearance="@style/TextAppearance.AppCompat.Display2"
-        app:layout_constraintTop_toBottomOf="@+id/topLbl"/>
-
-       <Button
-           android:id="@+id/btnMada"
-           android:layout_width="wrap_content"
-           android:layout_height="wrap_content"
-           android:text="מד&quot;א"
-           android:layout_margin="50dp"
-           android:layout_marginStart="50dp"
-           android:textAppearance="@style/TextAppearance.AppCompat.Display2"
-           app:layout_constraintTop_toBottomOf="@+id/btnIhudHazala"
-           />
-           -->
 </androidx.constraintlayout.widget.ConstraintLayout>
